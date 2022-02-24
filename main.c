@@ -51,5 +51,5 @@ int main()
     free(DC);
     free(symbolTable);
     free(codeImage);
-    return 0; /*fg*/
+    return 0; /*fgfdhg*/ 
 }
