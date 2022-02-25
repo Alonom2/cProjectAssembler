@@ -25,20 +25,19 @@ int main()
     DC[currentDataLine] = 0;
     /*insertMacros("bacon.txt", "eggs.am");*/
 
-    pointer = (symbol_table *)malloc(sizeof(symbol_table));
+    /*pointer = (symbol_table *)malloc(sizeof(symbol_table));*/
     symbolTable = (symbol_table *)malloc(sizeof(symbol_table));
     codeImage = (code_image *)malloc(sizeof(code_image));
 
 
-    symbolTable = pointer;
+    symbolTable->next = symbolTable;
     codeImage->currCodeLine = NULL;
     codeImage->firstCodeLine = NULL;
     codeImage->firstDataLine = NULL;
     codeImage->lastCodeLine = NULL;
     codeImage->lastDataLine = NULL;
 
-    label = extractLabel(currentLine);
-    symbolTable->next = symbolTable; 
+    label = extractLabel(currentLine); 
     symbolTable = processToSymbolTable(label, IC, DATA_ATT, symbolTable);
     label = extractLabel(currentLine2);
     symbolTable = processToSymbolTable(label, IC, DATA_ATT, symbolTable);
