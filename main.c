@@ -29,9 +29,7 @@ int main()
     symbolTable = (symbol_table **)malloc(sizeof(symbol_table));
     codeImage = (code_image *)malloc(sizeof(code_image));
 
-
-    symbolTable[0] = pointer;
-    symbolTable[0]->next = symbolTable[0];
+    symbolTable[0] = NULL;
     codeImage->currCodeLine = NULL;
     codeImage->firstCodeLine = NULL;
     codeImage->firstDataLine = NULL;
@@ -41,20 +39,22 @@ int main()
 
     label = extractLabel(currentLine); 
     symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, symbolTable[0]);
+
+    pointer = symbolTable[0]; /*now the pointer gets the value of the first struct*/
+
     label = extractLabel(currentLine2);
     symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, symbolTable[0]);
     label = extractLabel(currentLine3);
     symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, symbolTable[0]);
-    
+
     /*printf("\n%d\n", symbolTable->next->offset);*/
     /*printf("%d\n", DC[currentDataLine]);
     printf("\n\n%d\n", amountOfData(currentLine));
     extractDataToCodeImage(currentLine, DC);*/
 
-
+    freeSymbolTable(symbolTable[0]);
     free(IC);
     free(DC);
-    free(symbolTable);
     free(codeImage);
     return 0; /*fgfdhg*/ 
 }

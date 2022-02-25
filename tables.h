@@ -208,4 +208,6 @@ typedef struct code_image
 
 } code_image;
 
+void freeSymbolTable(symbol_table *symbolTable);
+
 #endif

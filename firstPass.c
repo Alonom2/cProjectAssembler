@@ -122,9 +122,9 @@ symbol_table *processToSymbolTable(char* label, int* IC, symbol_attribute attrib
 {
     symbol_table *newSymbol;
 
-    char *tempString = malloc(sizeof(char) * (strlen(label)+1));
+    /*char *tempString = malloc(sizeof(char) * (strlen(label)+1));
 
-    strcpy(tempString, label);
+    strcpy(tempString, label);*/
 
     newSymbol = (symbol_table *)malloc(sizeof(symbol_table));
 
