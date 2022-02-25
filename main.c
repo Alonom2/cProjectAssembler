@@ -9,7 +9,7 @@
 int main()
 {
     code_image *codeImage; /*code image*/
-    symbol_table *symbolTable; /*symbol table*/
+    symbol_table **symbolTable; /*symbol table*/
     symbol_table *pointer;
     int *IC, *DC;
     char *label;
@@ -25,24 +25,26 @@ int main()
     DC[currentDataLine] = 0;
     /*insertMacros("bacon.txt", "eggs.am");*/
 
-    /*pointer = (symbol_table *)malloc(sizeof(symbol_table));*/
-    symbolTable = (symbol_table *)malloc(sizeof(symbol_table));
+    pointer = (symbol_table *)malloc(sizeof(symbol_table));
+    symbolTable = (symbol_table **)malloc(sizeof(symbol_table));
     codeImage = (code_image *)malloc(sizeof(code_image));
 
 
-    symbolTable->next = symbolTable;
+    symbolTable[0] = pointer;
+    symbolTable[0]->next = symbolTable[0];
     codeImage->currCodeLine = NULL;
     codeImage->firstCodeLine = NULL;
     codeImage->firstDataLine = NULL;
     codeImage->lastCodeLine = NULL;
     codeImage->lastDataLine = NULL;
 
+
     label = extractLabel(currentLine); 
-    symbolTable = processToSymbolTable(label, IC, DATA_ATT, symbolTable);
+    symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, symbolTable[0]);
     label = extractLabel(currentLine2);
-    symbolTable = processToSymbolTable(label, IC, DATA_ATT, symbolTable);
+    symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, symbolTable[0]);
     label = extractLabel(currentLine3);
-    symbolTable = processToSymbolTable(label, IC, DATA_ATT, symbolTable);
+    symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, symbolTable[0]);
     
     /*printf("\n%d\n", symbolTable->next->offset);*/
     /*printf("%d\n", DC[currentDataLine]);

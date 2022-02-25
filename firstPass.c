@@ -110,7 +110,7 @@ char* extractLabel(char* currentLine)
 {
     int sizeSymbol = findSizeSymbol(currentLine);
     
-    char *symbol = (char *)malloc(sizeSymbol*sizeof(char));
+    char *symbol = (char *)malloc((sizeSymbol+1)*sizeof(char));
 
     strncpy(symbol, currentLine, sizeSymbol);
 

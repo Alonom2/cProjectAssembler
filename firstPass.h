@@ -48,19 +48,38 @@ int is_string(char* currentLine);
 
 int is_data(char* currentLine);
 
-/******************************findSizeSymbol*******************************/ 
+/*************************function: findSizeSymbol**************************/ 
+
+/* The input is a string (line of an assembly code that contains a lable)
+   The output is the amount of chars in the label's name                   */
 
 int findSizeSymbol(char* currentLine);
 
-/********************************extractLabel*******************************/    
+/*************************function: extractLabel****************************/ 
 
+/* The input is a string (line of assembly code that contains a lable)
+   The output is the label (string)                                        */
+    
 char* extractLabel(char* currentLine);
 
-/*******************************processSymbol*******************************/    
+/*************************function: processToSymbolTable********************/ 
+
+/* This function adds a label (which is part of the input) to  
+   symbolTable struct defined in "tables.h".
+
+   The input is a string (the label), pointer to int (the IC -
+   Instruction Counter), symbol_attribute (defined in "tables.h") and
+   pointer to symbolTable (defined in "tables.h") where it will be added.
+
+   The output is a pointer to symbolTable
+   (the same one the function added the label to)                          */    
 
 symbol_table *processToSymbolTable(char* label, int* IC, symbol_attribute attribute, symbol_table *symbolTable);
 
-/*******************************amountOfData*******************************/    
+/*************************function: amountOfData****************************/ 
+
+/* The input is a string (part of assembly code's line that contains data)
+                                          */   
 
 int amountOfData(char* currentLine);
 
