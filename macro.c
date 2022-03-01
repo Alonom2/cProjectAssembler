@@ -4,7 +4,7 @@
 #include <string.h>
 #include "macro.h"
 
-/*****************************insertMacros*************************************/    
+/****************************************************************************insertMacros********************************************************************************/    
 
 void insertMacros(char *inputFileName, char *outputFileName)
 {
@@ -15,7 +15,7 @@ void insertMacros(char *inputFileName, char *outputFileName)
 	paste_macros(inputFileName, outputFileName, number_of_macros);
         
 }    
-/*****************************remove_spaces************************************/
+/****************************************************************************remove_spaces*******************************************************************************/    
 
 void remove_spaces(char* str)
 {
@@ -32,7 +32,7 @@ void remove_spaces(char* str)
     str[count] = '\0';
 }
 
-/*****************************count_macros************************************/
+/****************************************************************************count_macros********************************************************************************/    
 
 int count_macros(char *inputFileName)
 {
@@ -58,7 +58,7 @@ int count_macros(char *inputFileName)
 	return number_of_macros;
 }
 
-/*****************************paste_macros************************************/
+/****************************************************************************paste_macros********************************************************************************/    
 
 void paste_macros(char *inputFileName, char *outputFileName, int number_of_macros)
 {

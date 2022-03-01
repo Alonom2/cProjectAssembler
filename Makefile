@@ -1,5 +1,5 @@
 CC=gcc
-INFILES= macro.c main.c firstPass.c tables.c
+INFILES= macro.c main.c firstPass.c tables.c shortFuncs.c
 
 CFLAGS= -ansi -Wall -pedantic -g -o
 

@@ -2,93 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "firstPass.h"
+#include "shortFuncs.h"
 
-/****************************func_is_entry**********************************/    
-
-int is_entry(char* currentLine)
-{
-    int value;
-
-    remove_spaces(currentLine);
-
-    if (strstr(currentLine, ".entry"))
-        value = TRUE;
-
-    else
-        value = FALSE;
-    
-    return value;
-}
-
-/****************************func_is_extern*********************************/    
-
-int is_extern(char* currentLine)
-{
-    int value;
-
-    remove_spaces(currentLine);
-
-    if (strstr(currentLine, ".extern"))
-        value = TRUE;
-
-    else
-        value = FALSE;
-    
-    return value;
-}
-
-/****************************func_is_label*********************************/    
-
-int is_label(char* currentLine)
-{
-    int value;
-
-    remove_spaces(currentLine);
-
-    if (strstr(currentLine, ":"))
-        value = TRUE;
-
-    else
-        value = FALSE;
-    
-    return value;
-}
-
-/******************************func_is_string*******************************/    
-
-int is_string(char* currentLine)
-{
-    int value;
-
-    remove_spaces(currentLine);
-
-    if (strstr(currentLine, ".string"))
-        value = TRUE;
-
-    else
-        value = FALSE;
-    
-    return value;
-}
-
-/*******************************func_is_data********************************/    
-
-int is_data(char* currentLine)
-{
-    int value;
-
-    remove_spaces(currentLine);
-
-    if (strstr(currentLine, ".data"))
-        value = TRUE;
-
-    else
-        value = FALSE;
-    
-    return value;
-}
-
-/******************************findSizeSymbol*******************************/ 
+/***********************************************************************findSizeSymbol***********************************************************************************/ 
 
 int findSizeSymbol(char* currentLine)
 {
@@ -104,7 +20,7 @@ int findSizeSymbol(char* currentLine)
     return sizeSymbol;
 }
 
-/********************************extractLabel*******************************/    
+/*************************************************************************extractLabel***********************************************************************************/ 
 
 char* extractLabel(char* currentLine)
 {
@@ -116,15 +32,12 @@ char* extractLabel(char* currentLine)
 
     return symbol;
 }
-/*******************************processSymbol*******************************/    
+
+/*********************************************************************processToSymbolTable*******************************************************************************/ 
 
 symbol_table *processToSymbolTable(char* label, int* IC, symbol_attribute attribute, symbol_table *symbolTable)
 {
     symbol_table *newSymbol;
-
-    /*char *tempString = malloc(sizeof(char) * (strlen(label)+1));
-
-    strcpy(tempString, label);*/
 
     newSymbol = (symbol_table *)malloc(sizeof(symbol_table));
 
@@ -140,15 +53,12 @@ symbol_table *processToSymbolTable(char* label, int* IC, symbol_attribute attrib
 
     newSymbol->next = symbolTable;
 
-    printf("%s\n%d\n%d\n%d\n", newSymbol->symbol, newSymbol->attribute, newSymbol->offset, newSymbol->base);
-
     return newSymbol;
-
 }
 
-/*******************************amountOfData*******************************/    
+/*******************************************************************amountOfCharsInData**********************************************************************************/ 
 
-int amountOfData(char* currentLine)
+int amountOfCharsInData(char* currentLine)
 {
     int charCounter = 0;
 
@@ -169,70 +79,190 @@ int amountOfData(char* currentLine)
 
     return charCounter;
 }
-/*******************************extractDataToCodeImage*******************************/    
 
-void extractDataToCodeImage(char* currentLine, int* DC)
+/***********************************************************************amountOfDatas************************************************************************************/ 
+
+int amountOfDatas(char* currentLine)
 {
-    code_line *tempLine = (code_line *)malloc(sizeof(code_line));
+    char *pointerToData;
+
+    int dataCounter = 0;
+
+    int charCounter = 0; /* extra safety measure against infinite loop */
+
+    if (strstr(currentLine, ".data"))
+    {
+        remove_spaces(currentLine);
+
+        pointerToData = strstr(currentLine, ".data");
+
+        for (charCounter = 0; (*pointerToData != '\0') && (charCounter < SIZE_LINE); charCounter++)
+        {
+            pointerToData++;
+
+            if (*pointerToData == ',')
+            {
+                dataCounter++;
+            }
+        }
+
+    }
+
+    return ++dataCounter;
+}
+
+/***********************************************************************amountOfChars************************************************************************************/ 
+
+int amountOfChars(char* currentLine)
+{
+    char *pointerToChar;
+
+    int charCounter = 0; 
+
+    if (strstr(currentLine, ".string"))
+    {
+        pointerToChar = (strstr(currentLine, "\"") + 1);
+
+        for (charCounter = 0; (*pointerToChar != '\"') && (charCounter < SIZE_LINE); charCounter++)
+        {
+            pointerToChar++;
+        }
+
+    }
+
+    return charCounter;
+}
+
+/***********************************************************************turnDataLineToArray******************************************************************************/ 
+
+int *turnDataLineToArray(char* currentLine)
+{
+    int counter, amount_of_data_chars, tempInt;
+
+    int amount = amountOfDatas(currentLine);
 
     char char_tempInt[SIZE_LINE];
 
-    int tempInt;
-
-    int amount_of_data; 
-
-    tempLine->address = (DC[0])++;
-
-    tempLine->code = (machine_code *)malloc(sizeof(machine_code));
+    int* array = (int *)malloc(amount*sizeof(int));
 
     remove_spaces(currentLine);
 
+    currentLine = strstr(currentLine, ":") + 6;
 
-    currentLine = (strstr(currentLine, ":") + 6);
-
-    while (strstr(currentLine, ","))
+    for (counter = 0; counter < amount - 1; counter++)
     {
-        amount_of_data = amountOfData(currentLine);
+        amount_of_data_chars = amountOfCharsInData(currentLine);
 
-        strncpy(char_tempInt, currentLine, amount_of_data);
+        char_tempInt[amount_of_data_chars] = '\0';
+
+        strncpy(char_tempInt, currentLine, amount_of_data_chars);
 
         tempInt = atof(char_tempInt);
 
-        currentLine = (strstr(currentLine, ",") + 1);
+        *(array + counter) = tempInt;
 
-        printf("\n\n%d\n", tempInt);
+        currentLine = (strstr(currentLine, ",") + 1);
     }
 
-    strncpy(char_tempInt, currentLine, sizeof(currentLine));
+    char_tempInt[sizeof(currentLine)/sizeof(char)] = '\0';
+
+    strcpy(char_tempInt, currentLine);
 
     tempInt = atof(char_tempInt);
 
+    *(array + counter) = tempInt;
 
-    printf("\n\n%d\n", tempInt);
+    return array;
+}
 
+/***********************************************************************turnStringLineToArray****************************************************************************/ 
 
-    /*tempLine->address = (DC[0])++;
+int *turnStringLineToArray(char* currentLine)
+{
+    int counter;
 
-    tempLine->code = (machine_code *)malloc(sizeof(machine_code));
+    int amount_of_chars = amountOfChars(currentLine);
 
-    tempLine->code->hexaCode = intToHexaCode(tempInt);
+    int* array = (int *)malloc(amount_of_chars*sizeof(int));
 
-    tempLine->code->ARE = ABSOLUTE;
+    currentLine = (strstr(currentLine, "\"") + 1);
 
-    tempLine->next=NULL;
-
-    int dataCounter, dataLen;
-
-
-    remove_spaces(currentLine);
-
-    currentLine = (strstr(currentLine, ":") + 6);
-
-    for (dataCounter = 0; dataCounter < amount_of_data; dataCounter++)
+    for (counter = 0; counter < amount_of_chars; counter++)
     {
-        dataLen = amountOfData(currentLine);
-
+        *(array + counter) = *(currentLine + counter);
     }
 
-    printf("\n\n%d\n", amountOfData(currentLine));*/
+    return array;
 }
+
+/********************************************************************extractDataToCodeImage******************************************************************************/ 
+
+code_image *extractDataToCodeImage(char* currentLine, int* DC, code_image *codeImage)
+{
+    int counter;
+
+    int amount_of_data = amountOfDatas(currentLine);
+
+    int *dataArray = (int *)malloc(amount_of_data*sizeof(int));
+
+    dataArray = turnDataLineToArray(currentLine);
+
+    code_line **tempLine = (code_line **)malloc(sizeof(code_line));
+
+    tempLine[0] = codeImage->lastDataLine;
+
+    for (counter = 0; counter < amount_of_data; counter++)
+    {
+        tempLine[0] = extractDataLineToCodeImage(*(dataArray + counter), DC, tempLine[0]);
+    }
+    
+    codeImage->lastDataLine = tempLine[0];
+
+
+    return codeImage;
+}
+
+/*******************************************************************extractStringToCodeImage*****************************************************************************/ 
+
+code_image *extractStringToCodeImage(char* currentLine, int* DC, code_image *codeImage)
+{
+    int counter;
+
+    int amount_of_chars = amountOfChars(currentLine);
+
+    int *charsArray = (int *)malloc(amount_of_chars*sizeof(int));
+
+    charsArray = turnStringLineToArray(currentLine);
+
+    code_line **tempLine = (code_line **)malloc(sizeof(code_line));
+
+    tempLine[0] = codeImage->lastDataLine;
+
+    for (counter = 0; counter < amount_of_chars; counter++)
+    {
+        tempLine[0] = extractDataLineToCodeImage(*(charsArray + counter), DC, tempLine[0]);
+    }
+    
+    codeImage->lastDataLine = tempLine[0];
+
+    return codeImage;
+}
+/******************************************************************extractDataLineToCodeImage****************************************************************************/ 
+
+code_line *extractDataLineToCodeImage(int n, int* DC, code_line *codeLine)
+{
+    code_line *newCodeLine = (code_line *)malloc(sizeof(code_line));
+
+    newCodeLine->address = (DC[0])++;
+
+    newCodeLine->code = (machine_code *)malloc(sizeof(machine_code));
+
+    newCodeLine->code->hexaCode = changeIntToHexa(n);
+
+    newCodeLine->code->ARE = ABSOLUTE;
+
+    newCodeLine->next = codeLine;
+
+    return newCodeLine;
+}
+

@@ -208,6 +208,16 @@ typedef struct code_image
 
 } code_image;
 
+/*************************function: freeSymbolTable************************/
+
+/* The function frees up all the space allocated to symbolTable           */
+                                      
 void freeSymbolTable(symbol_table *symbolTable);
+
+/**************************function: freeCodeImage*************************/
+
+/* The function frees up all the space allocated to codeImage             */
+                                      
+void freeCodeImage(code_image *codeImage);
 
 #endif

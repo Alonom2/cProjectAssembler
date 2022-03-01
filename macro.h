@@ -2,26 +2,33 @@
 #ifndef _MACRO_HEADER_
 #define _MACRO_HEADER_
 
-
 #define SIZE_LINE 81
 
-/******************************************************************************/
+/************************************************************************************************************************************************************************/
 
-void insertMacros(char *inputFileName, char *outputFileName); /*insert all macros decleared in the input file on the output file*/
+/* insert all macros decleared in the input file on the output file                                                                                                     */
 
-/******************************************************************************/
+void insertMacros(char *inputFileName, char *outputFileName); 
 
-void remove_spaces(char* str); /*deletes all the empty spaces inside the string*/
+/************************************************************************************************************************************************************************/
 
-/******************************************************************************/
+/* deletes all the empty spaces inside the string                                                                                                                       */
 
-int count_macros(char *inputFileName); /*counts the amount of macro decleration inside the file*/
+void remove_spaces(char* str); 
 
-/******************************************************************************/
+/************************************************************************************************************************************************************************/
 
-void paste_macros(char *inputFileName, char *outputFileName, int number_of_macros); /*opens a new file inside of which the text of the input file is copied after inserting the macros*/
+/* counts the amount of macro decleration inside the file                                                                                                               */
 
-/******************************************************************************/
+int count_macros(char *inputFileName); 
+
+/************************************************************************************************************************************************************************/
+
+/* opens a new file inside of which the text of the input file is copied after inserting the macros                                                                     */
+
+void paste_macros(char *inputFileName, char *outputFileName, int number_of_macros); 
+
+/************************************************************************************************************************************************************************/
 
 typedef struct preAssemblerMacros {
     
@@ -31,6 +38,6 @@ typedef struct preAssemblerMacros {
     
 } preAssemblerMacros;
 
-/******************************************************************************/
+/************************************************************************************************************************************************************************/
 
 #endif

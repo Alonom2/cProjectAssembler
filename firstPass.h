@@ -4,87 +4,109 @@
 #include "macro.h"
 #include "tables.h"
 
-/*****************************bool_enum*************************************/    
+/************************************************************************************************************************************************************************/ 
 
-typedef enum bool
-{
-    FALSE = 0,
-    TRUE = 1
-
-} bool;
-
-/*************************function: is_entry********************************/    
-
-/* checks if string ".entry" is part of the input.
-   retruns 1 if it is, 0 if it isn't                                       */
-
-int is_entry(char* currentLine);
-
-/*************************function: is_extern*******************************/  
-
-/* checks if string ".extern" is part of the input.
-   retruns 1 if it is, 0 if it isn't                                       */
-
-int is_extern(char* currentLine);
-
-/*************************function: is_label********************************/ 
-
-/* checks if char ':' is part of the input (which indicates a label)
-   retruns 1 if it is, 0 if it isn't                                       */
-
-int is_label(char* currentLine);
-
-/*************************function: is_string*******************************/    
-
-/* checks if string ".string" is part of the input.
-   retruns 1 if it is, 0 if it isn't                                       */
-
-int is_string(char* currentLine);
-
-/*************************function: is_data*********************************/ 
-
-/* checks if string ".data" is part of the input.
-   retruns 1 if it is, 0 if it isn't                                       */
-
-int is_data(char* currentLine);
-
-/*************************function: findSizeSymbol**************************/ 
-
-/* The input is a string (line of an assembly code that contains a lable)
-   The output is the amount of chars in the label's name                   */
+/* The input is a string that contains a label/symbol (all chars that appear before the char ':').
+   The output is the amount of chars in the label.                                                                                                                      */
 
 int findSizeSymbol(char* currentLine);
 
-/*************************function: extractLabel****************************/ 
+/************************************************************************************************************************************************************************/ 
 
-/* The input is a string (line of assembly code that contains a lable)
-   The output is the label (string)                                        */
+/* The input is a string that contains a label/symbol.
+   The output is the label/symbol.        
+   
+   This function uses the function above - "findSizeSymbol".                                                                                                              */
     
 char* extractLabel(char* currentLine);
 
-/*************************function: processToSymbolTable********************/ 
+/************************************************************************************************************************************************************************/ 
 
-/* This function adds a label (which is part of the input) to  
-   symbolTable struct defined in "tables.h".
+/* This function adds a label to symbolTable struct defined in "tables.h", and retruns a pointer to it afterward.
 
-   The input is a string (the label), pointer to int (the IC -
-   Instruction Counter), symbol_attribute (defined in "tables.h") and
-   pointer to symbolTable (defined in "tables.h") where it will be added.
-
-   The output is a pointer to symbolTable
-   (the same one the function added the label to)                          */    
+   The input is a string (label), pointer to int (the IC - Instruction Counter), symbol_attribute (defined in "tables.h") and pointer to symbolTable.                   */                                                                                                                        
 
 symbol_table *processToSymbolTable(char* label, int* IC, symbol_attribute attribute, symbol_table *symbolTable);
 
-/*************************function: amountOfData****************************/ 
+/************************************************************************************************************************************************************************/ 
 
-/* The input is a string (part of assembly code's line that contains data)
-                                          */   
+/* The input is a string that contains integers (that may include '+' and '-' signs), seperated by ',' (commas).
 
-int amountOfData(char* currentLine);
+   The output is the amount of chars in the first integer.
+   if no integer is found inside the string, the output will be zero.       
+   
+   This function uses the function "remove_spaces" declared in "macro.h".                                                                                                 */   
 
-/*******************************extractData*******************************/    
+int amountOfCharsInData(char* currentLine);
 
-void extractDataToCodeImage(char* currentLine, int* DC);
+/************************************************************************************************************************************************************************/ 
+
+/* The input is a string that contains the word ".data:", and immediatly afterward integers (that may include '+' and '-' signs), seperated by ',' (commas).
+   The output is the amount of integers declared inside the string after the word ".data:".      
+   
+   This function uses the function "remove_spaces" declared in "macro.h".                                                                                                 */
+
+int amountOfDatas(char* currentLine);
+
+/************************************************************************************************************************************************************************/ 
+
+/* The input is a string that contains the word ".string:", and immediatly afterward a sentence in quotation marks.
+   The output is the amount of chars inside the quotation marks.                                                                                                        */
+                                                                                               
+int amountOfChars(char* currentLine);
+
+/************************************************************************************************************************************************************************/ 
+
+/* The input is a string that contains the word ".data:", and immediatly afterward integers (that may include '+' and '-' signs), seperated by ',' (commas).
+   
+   This function allocates the needed amount of memory for all the integers inside the string, and puts them inside. The output is a pointer to the first integer.
+   
+   This function uses the functions "amountofDatas" and amountofCharsInData" declared above, and the function "remove_spaces" declared in "macro.h"                     */
+
+int *turnDataLineToArray(char* currentLine);
+
+/************************************************************************************************************************************************************************/ 
+
+/* The input is a string that contains the word ".string:", and immediatly afterward a sentence in quotation marks.
+
+   This function allocates the needed amount of memory for all the chars inside the quotation marks, and puts them inside. The output is a pointer to the first char.
+   
+   This function uses the functions "amountofChars" declared above.                                                                                                     */
+
+int *turnStringLineToArray(char* currentLine);
+
+/************************************************************************************************************************************************************************/ 
+
+/* This function updates the code_line "lastDataLine" inside a "code_image" struct defined in "tables.h", with the machine code translation
+   of "currentLine" input (which contains '.data'), and returns a pointer to it afterward.
+
+   The input is a string (assembly code with ".data"), pointer to int (the DC - Data Counter), and pointer to "code_image" struct.    
+   
+   This function uses the functions "amountOfDatas" and "turnDataLineToArray" declared above, and "extractDataLineToCodeImage" declared below.                          */                                                                                                                        
+
+code_image *extractDataToCodeImage(char* currentLine, int* DC, code_image *codeImage);
+
+/************************************************************************************************************************************************************************/ 
+
+/* This function updates the code_line "lastDataLine" inside a "code_image" struct defined in "tables.h", with the machine code translation
+   of "currentLine" input (which contains '.string'), and returns a pointer to it afterward.
+
+   The input is a string (assembly code with ".string"), pointer to int (the DC - Data Counter), and pointer to "code_image" struct.    
+   
+   This function uses the functions "amountOfDatas" and "turnStringLineToArray" declared above, and "extractDataLineToCodeImage" declared below.                          */
+
+code_image *extractStringToCodeImage(char* currentLine, int* DC, code_image *codeImage);
+
+/************************************************************************************************************************************************************************/ 
+
+/* This function updates a code_line with the machine code translation to input integer n.
+
+   The input is an integer, pointer to int (the DC - Data Counter), and pointer to "code_line" struct.    
+   
+   This function uses the function "changeIntToHexa" declared in "shortFuncs.h"                                                                                         */                                                                                                                        
+
+code_line *extractDataLineToCodeImage(int n, int* DC, code_line *codeLine);
+
+/************************************************************************************************************************************************************************/ 
 
 #endif
