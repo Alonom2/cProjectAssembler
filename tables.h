@@ -2,6 +2,7 @@
 #define _TABLES__HEADER_
 
 #include "macro.h"
+
 /***************************symbol_attributes********************************/
 
 typedef enum symbol_attribute
@@ -97,35 +98,6 @@ typedef enum ARE_property
 
 } ARE_property;
 
-/***********************command_addressing_method****************************/   /*still need to figure this one out*/
-
-typedef enum command_addressing_method
-{
-    /* no operand */
-    NONE_ADDR,
-    /* 1 */
-    DIRECT_ONLY_ADDR,
-    /* 0,1,3 */
-    NON_RELATIVE_ADDR,
-    /* 1,2 */
-    DIRECT_OR_RELATIVE_ADDR,
-    /* 1,3 */
-    DIRECT_OR_REGISTER_ADDR
-
-} command_addressing_method;
-
-/*****************************command_table**********************************/
-
-typedef struct command_table
-{
-    char name[16][5];
-    command_opcode opcodes[16];
-    command_funct functs[16];
-    command_addressing_method originOperandAddressingMethods[16];
-    command_addressing_method destinationOperandAddressingMethods[16];
-
-} command_table;
-
 /***********************operand_addressing_method****************************/
 
 typedef enum operand_addressing_method
@@ -160,9 +132,8 @@ typedef struct command
     operand_addressing_method destinationOperandAddressingMethod;
 
     char *destinationOperand;
-
+     
 } command;
-
 /****************************machine_code**********************************/
 
 typedef struct machine_code
@@ -219,5 +190,7 @@ void freeSymbolTable(symbol_table *symbolTable);
 /* The function frees up all the space allocated to codeImage             */
                                       
 void freeCodeImage(code_image *codeImage);
+
+void freeCommand(command *new_command);
 
 #endif

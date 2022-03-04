@@ -164,7 +164,14 @@ int *turnDataLineToArray(char* currentLine)
         currentLine = (strstr(currentLine, ",") + 1);
     }
 
-    char_tempInt[sizeof(currentLine)/sizeof(char)] = '\0';
+    counter = 0;
+
+    while (*(currentLine + counter) != '\0')
+    {
+        counter++;
+    }
+
+    char_tempInt[counter] = '\0';
 
     strcpy(char_tempInt, currentLine);
 
@@ -205,9 +212,9 @@ code_image *extractDataToCodeImage(char* currentLine, int* DC, code_image *codeI
 
     int *dataArray = (int *)malloc(amount_of_data*sizeof(int));
 
-    dataArray = turnDataLineToArray(currentLine);
-
     code_line **tempLine = (code_line **)malloc(sizeof(code_line));
+
+    dataArray = turnDataLineToArray(currentLine);
 
     tempLine[0] = codeImage->lastDataLine;
 
@@ -232,9 +239,9 @@ code_image *extractStringToCodeImage(char* currentLine, int* DC, code_image *cod
 
     int *charsArray = (int *)malloc(amount_of_chars*sizeof(int));
 
-    charsArray = turnStringLineToArray(currentLine);
-
     code_line **tempLine = (code_line **)malloc(sizeof(code_line));
+
+    charsArray = turnStringLineToArray(currentLine);
 
     tempLine[0] = codeImage->lastDataLine;
 
