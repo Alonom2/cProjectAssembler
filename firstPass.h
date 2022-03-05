@@ -109,4 +109,10 @@ code_line *extractDataLineToCodeImage(int n, int* DC, code_line *codeLine);
 
 /************************************************************************************************************************************************************************/ 
 
+code_image *extractCommandToCodeImage(int* IC, command* new_command, code_image *codeImage);
+
+/************************************************************************************************************************************************************************/ 
+
+char CodeLineSecondWordToMachineCode(command *new_command, int which);
+
 #endif

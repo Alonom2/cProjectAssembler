@@ -25,7 +25,7 @@ int main()
     char currentLine3[] = "OMER:  .data   +2, -9";
     char currentLine4[] = "STR: .string \"ab c  d\"";
     char currentLine5[] = "add r3 ,LIST";
-    char currentLine6[] = "dec K";
+    char currentLine6[] = "sub  r1, r4";
     char currentLine7[] = "bne END[r15]";
     char currentLine8[] = "stop";
 
@@ -62,19 +62,27 @@ int main()
     label = extractLabel(currentLine3);
     symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, symbolTable[0]);*/
 
+    
+    updateCommandAndFunc(currentLine8, command_table, test);
+    updateOperands(currentLine8, test);
+    updateAddressingMethods(currentLine8, test);
+    codeImage = extractCommandToCodeImage(IC, test, codeImage);
+
+    updateCommandAndFunc(currentLine5, command_table, test);
+    updateOperands(currentLine5, test);
+    updateAddressingMethods(currentLine5, test);
+    codeImage = extractCommandToCodeImage(IC, test, codeImage);
+
     codeImage = extractDataToCodeImage(currentLine, DC, codeImage);
     codeImage = extractDataToCodeImage(currentLine2, DC, codeImage);
     codeImage = extractStringToCodeImage(currentLine4, DC, codeImage);
     codeImage = extractDataToCodeImage(currentLine3, DC, codeImage);
-    updateCommandAndFunc(currentLine8, command_table, test);
-    updateOperands(currentLine8, test);
-    updateAddressingMethods(currentLine8, test);
-    printf("%d\n", test->opcode);
+    /*printf("%d\n", test->opcode);
     printf("%d\n", test->funct);
     printf("%s\n", test->originOperand);
     printf("%d\n", test->originOperandAddressingMethod);
     printf("%s\n", test->destinationOperand);
-    printf("%d\n", test->destinationOperandAddressingMethod);
+    printf("%d\n", test->destinationOperandAddressingMethod);*/
 
 
     freeSymbolTable(symbolTable[0]);
