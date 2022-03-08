@@ -26,7 +26,7 @@ char* extractLabel(char* currentLine);
 
    The input is a string (label), pointer to int (the IC - Instruction Counter), symbol_attribute (defined in "tables.h") and pointer to symbolTable.                   */                                                                                                                        
 
-symbol_table *processToSymbolTable(char* label, int* IC, symbol_attribute attribute, symbol_table *symbolTable);
+symbol_table *processToSymbolTable(char* label, int* IC, symbol_attribute attribute, int isExtern, symbol_table *symbolTable);
 
 /************************************************************************************************************************************************************************/ 
 
@@ -84,7 +84,7 @@ int *turnStringLineToArray(char* currentLine);
    
    This function uses the functions "amountOfDatas" and "turnDataLineToArray" declared above, and "extractDataLineToCodeImage" declared below.                          */                                                                                                                        
 
-code_image *extractDataToCodeImage(char* currentLine, int* DC, code_image *codeImage);
+code_image *extractDataToCodeImage(char* currentLine, int *IC, int* DC, code_image *codeImage);
 
 /************************************************************************************************************************************************************************/ 
 
@@ -95,7 +95,7 @@ code_image *extractDataToCodeImage(char* currentLine, int* DC, code_image *codeI
    
    This function uses the functions "amountOfDatas" and "turnStringLineToArray" declared above, and "extractDataLineToCodeImage" declared below.                          */
 
-code_image *extractStringToCodeImage(char* currentLine, int* DC, code_image *codeImage);
+code_image *extractStringToCodeImage(char* currentLine, int *IC, int* DC, code_image *codeImage);
 
 /************************************************************************************************************************************************************************/ 
 
@@ -105,14 +105,22 @@ code_image *extractStringToCodeImage(char* currentLine, int* DC, code_image *cod
    
    This function uses the function "changeIntToHexa" declared in "shortFuncs.h"                                                                                         */                                                                                                                        
 
-code_line *extractDataLineToCodeImage(int n, int* DC, code_line *codeLine);
+code_line *extractDataLineToCodeImage(int n, int *IC, int* DC, code_line *codeLine);
 
 /************************************************************************************************************************************************************************/ 
 
 code_image *extractCommandToCodeImage(int* IC, command* new_command, code_image *codeImage);
 
-/************************************************************************************************************************************************************************/ 
+/************************************************************************************************************************************************************************/
+
+code_line *extractCodeLineToCodeImage(int word, int* IC, char *hexaChar, code_line *codeLine, command* new_command);
+
+/************************************************************************************************************************************************************************/
 
 char CodeLineSecondWordToMachineCode(command *new_command, int which);
+
+/************************************************************************************************************************************************************************/ 
+
+int numOfRegisterIndex_ADDR(command *new_command);
 
 #endif

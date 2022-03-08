@@ -9,40 +9,42 @@
 
 int main()
 {
+    char currentLine[SIZE_LINE];
+    FILE* fPointer1;
+
     char command_table[16][5] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "jsr", "red", "prn", "rts", "stop"};
-    command *test;
+    int *IC, *DC;
+    char *label;
+
+    command *commandPointer;
     code_image *codeImage; /*code image*/
     symbol_table **symbolTable; /*symbol table*/
-    symbol_table *pointer;
 
-    int *IC, *DC, *array;
-    char *label;
 
 /*************************Strings for tests*******************************/
 
-    char currentLine[] = "LIST:  .data   +6, -9, 8, 378";
-    char currentLine2[] = "LOOP:  .data   +12, -5";
+    /*char currentLine2[] = "LOOP:  .data   +12, -5";
     char currentLine3[] = "OMER:  .data   +2, -9";
     char currentLine4[] = "STR: .string \"ab c  d\"";
     char currentLine5[] = "add r3 ,LIST";
     char currentLine6[] = "sub  r1, r4";
     char currentLine7[] = "bne END[r15]";
-    char currentLine8[] = "stop";
+    char currentLine8[] = "stop";*/
 
 /*************************************************************************/
 
-    int currentDataLine = 0;
+    fPointer1 = fopen("eggs.am", "r");
     IC = (int *)malloc(sizeof(int)); 
     DC = (int *)malloc(sizeof(int));
-    array = (int *)malloc(4*sizeof(int));
+
     IC[0] = 100;
-    DC[currentDataLine] = 0;
+    DC[0] = 0;
     /*insertMacros("bacon.txt", "eggs.am");*/
 
-    pointer = (symbol_table *)malloc(sizeof(symbol_table));
+    label = (char *)malloc(SIZE_LINE*sizeof(char));
     symbolTable = (symbol_table **)malloc(sizeof(symbol_table));
     codeImage = (code_image *)malloc(sizeof(code_image));
-    test = (command *)malloc(sizeof(command));
+    commandPointer = (command *)malloc(sizeof(command));
 
     symbolTable[0] = NULL;
     codeImage->currCodeLine = NULL;
@@ -62,34 +64,102 @@ int main()
     label = extractLabel(currentLine3);
     symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, symbolTable[0]);*/
 
-    
-    updateCommandAndFunc(currentLine8, command_table, test);
-    updateOperands(currentLine8, test);
-    updateAddressingMethods(currentLine8, test);
-    codeImage = extractCommandToCodeImage(IC, test, codeImage);
+    while(!feof(fPointer1))
+    {
+        fgets(currentLine, SIZE_LINE, fPointer1);
 
-    updateCommandAndFunc(currentLine5, command_table, test);
-    updateOperands(currentLine5, test);
-    updateAddressingMethods(currentLine5, test);
-    codeImage = extractCommandToCodeImage(IC, test, codeImage);
+        if (is_label(currentLine))
+        {
+            if (is_data(currentLine))
+            {
+                label = extractLabel(currentLine);
 
-    codeImage = extractDataToCodeImage(currentLine, DC, codeImage);
-    codeImage = extractDataToCodeImage(currentLine2, DC, codeImage);
-    codeImage = extractStringToCodeImage(currentLine4, DC, codeImage);
-    codeImage = extractDataToCodeImage(currentLine3, DC, codeImage);
-    /*printf("%d\n", test->opcode);
-    printf("%d\n", test->funct);
-    printf("%s\n", test->originOperand);
-    printf("%d\n", test->originOperandAddressingMethod);
-    printf("%s\n", test->destinationOperand);
-    printf("%d\n", test->destinationOperandAddressingMethod);*/
+                codeImage = extractDataToCodeImage(currentLine, IC, DC, codeImage);
 
+                symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, 0, symbolTable[0]);
+
+                continue;
+            }
+
+            else if (is_string(currentLine))
+            {
+                label = extractLabel(currentLine);
+
+                symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, 0, symbolTable[0]);
+
+                codeImage = extractStringToCodeImage(currentLine, IC, DC, codeImage);
+
+                continue;
+            }
+
+            else if (is_extern(currentLine))
+            {
+                label = extractLabel(currentLine);
+
+                symbolTable[0] = processToSymbolTable(label, IC, EXTERN_ATT, 1, symbolTable[0]);
+
+                continue;
+            }
+
+            else if (is_entry(currentLine))
+            {
+
+                continue;
+            }
+            
+            else
+            {
+                remove_spaces(currentLine);
+
+                if (*(currentLine) == '\0' || *(currentLine) == '\n')
+                {
+                    continue;
+                }
+
+                else
+                {
+                    label = extractLabel(currentLine);
+
+                    symbolTable[0] = processToSymbolTable(label, IC, CODE_ATT, 0, symbolTable[0]);
+
+                    updateCommandAndFunc(currentLine, command_table, commandPointer);
+
+                    updateOperands(currentLine, commandPointer);
+
+                    updateAddressingMethods(currentLine, commandPointer);
+
+                    codeImage = extractCommandToCodeImage(IC, commandPointer, codeImage);
+                }
+            }
+        }
+
+        else
+        {
+            remove_spaces(currentLine);
+
+                if (*(currentLine) == '\0' || *(currentLine) == '\n')
+                {
+                    continue;
+                }
+
+                else
+                {
+                    updateCommandAndFunc(currentLine, command_table, commandPointer);
+
+                    updateOperands(currentLine, commandPointer);
+
+                    updateAddressingMethods(currentLine, commandPointer);
+
+                    codeImage = extractCommandToCodeImage(IC, commandPointer, codeImage);
+                }
+        }
+    }
 
     freeSymbolTable(symbolTable[0]);
     freeCodeImage(codeImage);
     free(IC);
     free(DC);
-    freeCommand(test);
+    freeCommand(commandPointer);
 
     return 0; 
 }

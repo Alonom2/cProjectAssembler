@@ -19,7 +19,7 @@ char *changeIntToHexa(int n)
 
     if (n < 0)
     {
-        n += 4096;
+        n += 65536;
     }
 
     hexa[3] = changeIntToHexaChar(n % 16);
@@ -32,10 +32,7 @@ char *changeIntToHexa(int n)
 
     hexa[1] = changeIntToHexaChar(n % 16);
 
-    if (n > 15)
-    {
-         n = n / 16;
-    }
+    n = n / 16;
 
     hexa[0] = changeIntToHexaChar(n);
     
@@ -112,6 +109,9 @@ int is_label(char* currentLine)
     if (strstr(currentLine, ":"))
         value = TRUE;
 
+    else if (*currentLine == '.')
+        value = TRUE;
+
     else
         value = FALSE;
     
@@ -162,6 +162,11 @@ void updateCommandAndFunc(char* currentLine, char command_table[16][5], command 
 
     for (counter = 0; counter < 16; counter++)
     {
+        if (is_label(currentLine))
+        {
+            currentLine = strstr(currentLine, ":") + 1;
+        }
+
         if (strstr(currentLine, command_table[counter]) == currentLine)
         {
             if (counter == 0 || counter == 1 || counter == 4 || counter == 12 || counter == 13 || counter == 14 || counter == 15)
@@ -241,6 +246,11 @@ void updateOperands(char *currentLine, command *new_command)
     int counter = 0;
     char *tempOperand1 = (char *)malloc(SIZE_LINE*sizeof(char));
     char *tempOperand2 = (char *)malloc(SIZE_LINE*sizeof(char));
+
+    if (is_label(currentLine))
+    {
+        currentLine = strstr(currentLine, ":") + 1;
+    }
 
     switch(new_command->opcode)
     {
@@ -767,9 +777,21 @@ bool isREGISTER_ADDR(char *currentLine, int operand)
 
 void updateAddressingMethods(char *currentLine, command *new_command)
 {
+    int done = 0;
+
     remove_spaces(currentLine);
+
+    if (is_label(currentLine))
+    {
+        currentLine = strstr(currentLine, ":") + 1;
+    }
+
+    if (*(new_command->originOperand) == '0')
+    {
+        new_command->originOperandAddressingMethod = NO_OPERAND;
+    }
     
-    if (isIMMEDIATE_ADDR(currentLine, 1))
+    else if (isIMMEDIATE_ADDR(currentLine, 1))
     {
         if (new_command->opcode == 0 || new_command->opcode == 1 || new_command->opcode == 2)
         {
@@ -798,16 +820,13 @@ void updateAddressingMethods(char *currentLine, command *new_command)
         new_command->originOperandAddressingMethod = DIRECT_ADDR;
     }
 
-    else
-    {
-        new_command->originOperandAddressingMethod = NO_OPERAND;
-    }
-
     if (isIMMEDIATE_ADDR(currentLine, 2))
     {
         if (new_command->opcode == 1)
         {
             new_command->destinationOperandAddressingMethod = IMMEDIATE_ADDR;
+
+            done = 1;
         }
     }
 
@@ -816,6 +835,8 @@ void updateAddressingMethods(char *currentLine, command *new_command)
         if (new_command->opcode == 0 || new_command->opcode == 1 || new_command->opcode == 2 || new_command->opcode == 4)
         {
             new_command->destinationOperandAddressingMethod = INDEX_ADDR;
+
+            done = 1;
         }
     }
 
@@ -824,46 +845,53 @@ void updateAddressingMethods(char *currentLine, command *new_command)
         if (new_command->opcode == 0 || new_command->opcode == 1 || new_command->opcode == 2 || new_command->opcode == 4)
         {
             new_command->destinationOperandAddressingMethod = REGISTER_ADDR;
+
+            done = 1;
         }
     }
 
     else if (new_command->opcode == 0 || new_command->opcode == 1 || new_command->opcode == 2 || new_command->opcode == 4)
     {
         new_command->destinationOperandAddressingMethod = DIRECT_ADDR;
+
+        done = 1;
     }
     
-
-    if (isIMMEDIATE_ADDR(currentLine, 3))
+    if (done != 1)
     {
-        if (new_command->opcode == 13)
+        if (isIMMEDIATE_ADDR(currentLine, 3))
         {
-            new_command->destinationOperandAddressingMethod = IMMEDIATE_ADDR;
+            if (new_command->opcode == 13)
+            {
+                new_command->destinationOperandAddressingMethod = IMMEDIATE_ADDR;
+            }
+        }
+
+        else if (isINDEX_ADDR(currentLine, 3))
+        {
+            if (new_command->opcode == 5 || new_command->opcode == 9 || new_command->opcode == 12 || new_command->opcode == 13)
+            {
+                new_command->destinationOperandAddressingMethod = INDEX_ADDR;
+            }
+        }
+
+        else if (isREGISTER_ADDR(currentLine, 3))
+        {
+            if (new_command->opcode == 5 || new_command->opcode == 12 || new_command->opcode == 13)
+            {
+                new_command->destinationOperandAddressingMethod = REGISTER_ADDR;
+            }
+        }
+
+        else if (new_command->opcode == 5 || new_command->opcode == 9 || new_command->opcode == 12 || new_command->opcode == 13)
+        {
+            new_command->destinationOperandAddressingMethod = DIRECT_ADDR;
+        }
+
+        else
+        {
+            new_command->destinationOperandAddressingMethod = NO_OPERAND;
         }
     }
-
-    else if (isINDEX_ADDR(currentLine, 3))
-    {
-        if (new_command->opcode == 5 || new_command->opcode == 9 || new_command->opcode == 12 || new_command->opcode == 13)
-        {
-            new_command->destinationOperandAddressingMethod = INDEX_ADDR;
-        }
-    }
-
-    else if (isREGISTER_ADDR(currentLine, 3))
-    {
-        if (new_command->opcode == 5 || new_command->opcode == 12 || new_command->opcode == 13)
-        {
-            new_command->destinationOperandAddressingMethod = REGISTER_ADDR;
-        }
-    }
-
-    else if (new_command->opcode == 5 || new_command->opcode == 9 || new_command->opcode == 12 || new_command->opcode == 13)
-    {
-        new_command->destinationOperandAddressingMethod = DIRECT_ADDR;
-    }
-
-    else
-    {
-        new_command->destinationOperandAddressingMethod = NO_OPERAND;
-    }
+    
 }
