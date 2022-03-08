@@ -10,10 +10,11 @@
 int main()
 {
     char currentLine[SIZE_LINE];
+    char previousLine[SIZE_LINE];
     FILE* fPointer1;
 
     char command_table[16][5] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "jsr", "red", "prn", "rts", "stop"};
-    int *IC, *DC;
+    int *IC, *DC, counter, ICF, DCF, wasLabel = 0;
     char *label;
 
     command *commandPointer;
@@ -66,6 +67,11 @@ int main()
 
     while(!feof(fPointer1))
     {
+        for (counter = 0; counter < SIZE_LINE; counter++)
+        {
+            previousLine[counter] = currentLine[counter];
+        }
+
         fgets(currentLine, SIZE_LINE, fPointer1);
 
         if (is_label(currentLine))
@@ -74,9 +80,11 @@ int main()
             {
                 label = extractLabel(currentLine);
 
+                symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, 0, symbolTable[0]);
+
                 codeImage = extractDataToCodeImage(currentLine, IC, DC, codeImage);
 
-                symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, 0, symbolTable[0]);
+                wasLabel = 1;
 
                 continue;
             }
@@ -89,6 +97,8 @@ int main()
 
                 codeImage = extractStringToCodeImage(currentLine, IC, DC, codeImage);
 
+                wasLabel = 1;
+
                 continue;
             }
 
@@ -98,11 +108,20 @@ int main()
 
                 symbolTable[0] = processToSymbolTable(label, IC, EXTERN_ATT, 1, symbolTable[0]);
 
+                if (wasLabel == 1)
+                {
+                    wasLabel = 0;
+                }
+
                 continue;
             }
 
             else if (is_entry(currentLine))
             {
+                if (wasLabel == 1)
+                {
+                    wasLabel = 0;
+                }
 
                 continue;
             }
@@ -129,6 +148,11 @@ int main()
                     updateAddressingMethods(currentLine, commandPointer);
 
                     codeImage = extractCommandToCodeImage(IC, commandPointer, codeImage);
+
+                    if (wasLabel == 1)
+                    {
+                        wasLabel = 0;
+                    }
                 }
             }
         }
@@ -142,6 +166,22 @@ int main()
                     continue;
                 }
 
+                else if (is_data(currentLine))
+                {
+                    if (is_data(previousLine) && wasLabel == 1)
+                    {
+                        codeImage = extractDataToCodeImage(currentLine, IC, DC, codeImage);
+                    }
+                }
+
+                else if (is_string(currentLine))
+                {
+                    if (is_string(previousLine) && wasLabel == 1)
+                    {
+                        codeImage = extractStringToCodeImage(currentLine, IC, DC, codeImage);
+                    }
+                }
+
                 else
                 {
                     updateCommandAndFunc(currentLine, command_table, commandPointer);
@@ -151,9 +191,17 @@ int main()
                     updateAddressingMethods(currentLine, commandPointer);
 
                     codeImage = extractCommandToCodeImage(IC, commandPointer, codeImage);
+
+                    if (wasLabel == 1)
+                    {
+                        wasLabel = 0;
+                    }
                 }
         }
     }
+
+    ICF = *(IC) - 1;
+    DCF = *(DC) - 1;
 
     freeSymbolTable(symbolTable[0]);
     freeCodeImage(codeImage);

@@ -107,13 +107,27 @@ int is_label(char* currentLine)
     remove_spaces(currentLine);
 
     if (strstr(currentLine, ":"))
+    {
         value = TRUE;
+    }
 
     else if (*currentLine == '.')
-        value = TRUE;
+    {
+        if (*(currentLine + 1) == 'e')
+        {
+            value = TRUE;
+        }
+
+        else
+        {
+            value = FALSE;
+        }
+    }
 
     else
+    {
         value = FALSE;
+    }
     
     return value;
 }

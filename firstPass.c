@@ -185,11 +185,19 @@ int *turnDataLineToArray(char* currentLine)
 
     char char_tempInt[SIZE_LINE];
 
-    int* array = (int *)malloc(amount*sizeof(int));
+    int* array = (int *)malloc((amount+1)*sizeof(int));
 
     remove_spaces(currentLine);
 
-    currentLine = strstr(currentLine, ":") + 6;
+    if (strstr(currentLine, ":"))
+    {
+        currentLine = strstr(currentLine, ":") + 6;
+    }
+
+    else
+    {
+        currentLine = strstr(currentLine, ".data") + 5;
+    }
 
     for (counter = 0; counter < amount - 1; counter++)
     {
@@ -219,7 +227,15 @@ int *turnDataLineToArray(char* currentLine)
 
     tempInt = atof(char_tempInt);
 
-    *(array + counter - 1) = tempInt;
+    if (amount > 1)
+    {
+        *(array + counter - 1) = tempInt;
+    }
+
+    else
+    {
+        *(array) = tempInt;
+    }
 
     return array;
 }
@@ -254,18 +270,20 @@ code_image *extractDataToCodeImage(char* currentLine, int *IC, int* DC, code_ima
 
     int *dataArray = (int *)malloc(amount_of_data*sizeof(int));
 
-    code_line **tempLine = (code_line **)malloc(sizeof(code_line));
+    code_line *tempLine = (code_line *)malloc(sizeof(code_line));
 
     dataArray = turnDataLineToArray(currentLine);
 
-    tempLine[0] = codeImage->lastDataLine;
+    tempLine = codeImage->lastDataLine;
 
     for (counter = 0; counter < amount_of_data; counter++)
     {
-        tempLine[0] = extractDataLineToCodeImage(*(dataArray + counter), IC, DC, tempLine[0]);
+        tempLine = extractDataLineToCodeImage(*(dataArray + counter), IC, DC, tempLine);
+
+        (IC[0])++;
     }
     
-    codeImage->lastDataLine = tempLine[0];
+    codeImage->lastDataLine = tempLine;
 
 
     return codeImage;
@@ -281,18 +299,22 @@ code_image *extractStringToCodeImage(char* currentLine, int *IC, int* DC, code_i
 
     int *charsArray = (int *)malloc(amount_of_chars*sizeof(int));
 
-    code_line **tempLine = (code_line **)malloc(sizeof(code_line));
+    code_line *tempLine = (code_line *)malloc(sizeof(code_line));
 
     charsArray = turnStringLineToArray(currentLine);
 
-    tempLine[0] = codeImage->lastDataLine;
+    tempLine = codeImage->lastDataLine;
 
     for (counter = 0; counter < amount_of_chars; counter++)
     {
-        tempLine[0] = extractDataLineToCodeImage(*(charsArray + counter), IC, DC, tempLine[0]);
+        tempLine = extractDataLineToCodeImage(*(charsArray + counter), IC, DC, tempLine);
+
+        (IC[0])++;
     }
+
+    (IC[0])++;
     
-    codeImage->lastDataLine = tempLine[0];
+    codeImage->lastDataLine = tempLine;
 
     return codeImage;
 }
