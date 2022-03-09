@@ -48,6 +48,11 @@ char* extractLabel(char* currentLine)
         strncpy(symbol, currentLine + 7, sizeSymbol);
     }
 
+    else if (is_entry(currentLine))
+    {
+        strncpy(symbol, currentLine + 6, sizeSymbol);
+    }
+
     else
     {
         strncpy(symbol, currentLine, sizeSymbol);
@@ -67,6 +72,8 @@ symbol_table *processToSymbolTable(char* label, int* IC, symbol_attribute attrib
     newSymbol->symbol = label;
 
     newSymbol->attribute = attribute;
+
+    newSymbol->attribute_2 = UNDEFINED_ATT;
 
     if (isExtern == 1)
     {
@@ -282,7 +289,7 @@ code_image *extractDataToCodeImage(char* currentLine, int *IC, int* DC, code_ima
 
         (IC[0])++;
     }
-    
+
     codeImage->lastDataLine = tempLine;
 
 
@@ -344,6 +351,8 @@ code_image *extractCommandToCodeImage(int* IC, command* new_command, code_image 
 {
     code_line *tempLine = (code_line *)malloc(sizeof(code_line));
 
+    int counter = 0;
+
     char *hexaChar;
     
     char char3 = CodeLineSecondWordToMachineCode(new_command, 3);
@@ -371,6 +380,10 @@ code_image *extractCommandToCodeImage(int* IC, command* new_command, code_image 
     if (new_command->opcode == RTS_OP || new_command->opcode == STOP_OP)
     {
         codeImage->lastCodeLine = tempLine;
+
+        tempLine->label_1 = "NO_LABEL";
+
+        tempLine->label_2 = "NO_LABEL";
 
         return codeImage;
     }
@@ -404,6 +417,44 @@ code_image *extractCommandToCodeImage(int* IC, command* new_command, code_image 
         tempLine = extractCodeLineToCodeImage(4, IC, hexaChar, tempLine, new_command);
     }
 
+    if (new_command->originOperandAddressingMethod == DIRECT_ADDR)
+    {
+        tempLine->label_1 = new_command->originOperand;
+    }
+
+    else if (new_command->originOperandAddressingMethod == INDEX_ADDR)
+    {
+        tempLine->label_1 = new_command->originOperand;
+
+        while (*(new_command->originOperand + counter) != '[')
+        {
+            counter++;
+        }
+
+        *(tempLine->label_1 + counter) = '\0';
+
+        counter = 0;
+    }
+
+    if (new_command->destinationOperandAddressingMethod == DIRECT_ADDR)
+    {
+        tempLine->label_2 = new_command->destinationOperand;
+    }
+
+    else if (new_command->destinationOperandAddressingMethod == INDEX_ADDR)
+    {
+        tempLine->label_2 = new_command->destinationOperand;
+
+        while (*(new_command->destinationOperand + counter) != '[')
+        {
+            counter++;
+        }
+
+        *(tempLine->label_2 + counter) = '\0';
+
+        counter = 0;
+    }
+
     codeImage->lastCodeLine = tempLine;
 
     return codeImage;
@@ -425,6 +476,10 @@ code_line *extractCodeLineToCodeImage(int word, int* IC, char *hexaChar, code_li
 
         newCodeLine->code->ARE = ABSOLUTE;
 
+        newCodeLine->label_1 = "NO_LABEL";
+
+        newCodeLine->label_2 = "NO_LABEL";
+
         newCodeLine->next = codeLine;
 
         return newCodeLine;
@@ -439,6 +494,10 @@ code_line *extractCodeLineToCodeImage(int word, int* IC, char *hexaChar, code_li
         newCodeLine->code->hexaCode = hexaChar;
 
         newCodeLine->code->ARE = ABSOLUTE;
+
+        newCodeLine->label_1 = "NO_LABEL";
+
+        newCodeLine->label_2 = "NO_LABEL";
 
         newCodeLine->next = codeLine;
 
@@ -463,6 +522,10 @@ code_line *extractCodeLineToCodeImage(int word, int* IC, char *hexaChar, code_li
 
         newCodeLine->code->ARE = ABSOLUTE;
 
+        newCodeLine->label_1 = "NO_LABEL";
+
+        newCodeLine->label_2 = "NO_LABEL";
+
         newCodeLine->next = codeLine;
 
         return newCodeLine;
@@ -473,6 +536,10 @@ code_line *extractCodeLineToCodeImage(int word, int* IC, char *hexaChar, code_li
         newCodeLine->address = (IC[0])++;
 
         newCodeLine->code = (machine_code *)malloc(sizeof(machine_code));
+
+        newCodeLine->label_1 = "NO_LABEL";
+
+        newCodeLine->label_2 = "NO_LABEL";
 
         newCodeLine->next = codeLine;
 

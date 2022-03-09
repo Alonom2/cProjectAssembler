@@ -4,6 +4,7 @@
 #include "macro.h"
 #include "firstPass.h"
 #include "shortFuncs.h"
+#include "secondPass.h"
 
 
 
@@ -14,8 +15,9 @@ int main()
     FILE* fPointer1;
 
     char command_table[16][5] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "jsr", "red", "prn", "rts", "stop"};
-    int *IC, *DC, counter, ICF, DCF, wasLabel = 0;
+    int *IC, *DC, counter, wasLabel = 0, notSameSymbol = 1, close_to_null_code = 0;
     char *label;
+    symbol_table *symbolPointer;
 
     command *commandPointer;
     code_image *codeImage; /*code image*/
@@ -64,6 +66,9 @@ int main()
     symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, symbolTable[0]);
     label = extractLabel(currentLine3);
     symbolTable[0] = processToSymbolTable(label, IC, DATA_ATT, symbolTable[0]);*/
+
+
+/****************************************************FirstPass************************************************************/
 
     while(!feof(fPointer1))
     {
@@ -200,14 +205,154 @@ int main()
         }
     }
 
-    ICF = *(IC) - 1;
-    DCF = *(DC) - 1;
+    fclose(fPointer1);
 
+/****************************************************SecondPass***********************************************************/
+    fPointer1 = fopen("eggs.am", "r");
+
+    while(!feof(fPointer1))
+    {
+        fgets(currentLine, SIZE_LINE, fPointer1);
+
+        if (is_entry(currentLine))
+        {
+            label = extractLabel(currentLine);
+
+            symbolPointer = symbolTable[0];
+
+            while (symbolPointer != NULL)
+            {
+                if (*(symbolPointer->symbol) == *(label) && strlen(symbolPointer->symbol) == strlen(label))
+                {   
+                    for (counter = 0; counter < strlen(label); counter++)
+                    {
+                        if (*(symbolPointer->symbol + counter) == *(label + counter))
+                        {
+                            continue;
+                        }
+
+                        else
+                        {
+                            notSameSymbol = 1;
+                        }
+                    }
+
+                    if (notSameSymbol == 0)
+                    {
+                        symbolPointer->attribute_2 = ENTRY_ATT;
+                    }
+                }
+
+                symbolPointer = symbolPointer->next;
+
+                notSameSymbol = 0;
+            }
+        }
+    }
+
+    symbolPointer = symbolTable[0];
+
+    while (symbolPointer != NULL)
+    {
+        codeImage->currCodeLine = codeImage->lastCodeLine;
+
+        while (codeImage->currCodeLine != NULL)
+        {
+            if (codeImage->currCodeLine->next == NULL)
+            {
+                close_to_null_code = 1;
+            }
+
+            if (labelcmp(codeImage, symbolPointer) == 0 && close_to_null_code == 0)
+            {
+                codeImage->currCodeLine = codeImage->currCodeLine->next;
+
+                continue;
+            }
+
+            else if (labelcmp(codeImage, symbolPointer) != 0)
+            {
+                if (codeImage->currCodeLine->code->hexaCode == NULL)
+                {
+                    if (labelcmp(codeImage, symbolPointer) > 0)
+                    {
+                        codeImage->currCodeLine->code->hexaCode = changeIntToHexa(symbolPointer->offset);
+
+                        codeImage->currCodeLine->code->ARE = EXTERNAL;
+
+                        codeImage->currCodeLine->next->code->hexaCode = changeIntToHexa(symbolPointer->base);
+
+                        codeImage->currCodeLine->next->code->ARE = EXTERNAL;
+                    }
+
+                    if (labelcmp(codeImage, symbolPointer) == 3)
+                    {
+                        codeImage->currCodeLine->next->next->code->hexaCode = changeIntToHexa(symbolPointer->next->offset);
+
+                        codeImage->currCodeLine->next->next->code->ARE = EXTERNAL;
+
+                        codeImage->currCodeLine->next->next->next->code->hexaCode = changeIntToHexa(symbolPointer->next->base);
+
+                        codeImage->currCodeLine->next->next->next->code->ARE = EXTERNAL;
+                    }
+                }
+
+                else if (codeImage->currCodeLine->code->hexaCode != NULL)
+                {
+                    if (labelcmp(codeImage, symbolPointer) > 0)
+                    {
+                        codeImage->currCodeLine->next->code->hexaCode = changeIntToHexa(symbolPointer->offset);
+
+                        codeImage->currCodeLine->next->code->ARE = EXTERNAL;
+
+                        codeImage->currCodeLine->next->next->code->hexaCode = changeIntToHexa(symbolPointer->base);
+
+                        codeImage->currCodeLine->next->next->code->ARE = EXTERNAL;
+                    }
+
+                    if (labelcmp(codeImage, symbolPointer) == 3)
+                    {
+                        codeImage->currCodeLine->next->next->next->code->hexaCode = changeIntToHexa(symbolPointer->next->offset);
+
+                        codeImage->currCodeLine->next->next->next->code->ARE = EXTERNAL;
+
+                        codeImage->currCodeLine->next->next->next->next->code->hexaCode = changeIntToHexa(symbolPointer->next->base);
+
+                        codeImage->currCodeLine->next->next->next->next->code->ARE = EXTERNAL;
+                    }
+                }
+            }
+            
+
+            if (close_to_null_code == 1)
+            {
+                close_to_null_code = 0;
+
+                break;
+            }
+
+            codeImage->currCodeLine = codeImage->currCodeLine->next;
+        }
+        
+        if (symbolPointer->next == NULL)
+        {
+            break;
+        }
+
+        else
+        {
+            symbolPointer = symbolPointer->next;
+        }
+    }
+
+    fclose(fPointer1);
     freeSymbolTable(symbolTable[0]);
     freeCodeImage(codeImage);
     free(IC);
     free(DC);
     freeCommand(commandPointer);
+    free(symbolPointer);
+    free(commandPointer);
 
     return 0; 
 }

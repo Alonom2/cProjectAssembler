@@ -38,6 +38,17 @@ void freeCodeImage(code_image *codeImage)
         
         codeImage->lastDataLine = temp;
     }
+
+    while (codeImage->lastCodeLine != NULL)
+    {
+        temp = codeImage->lastCodeLine->next;
+
+        free(codeImage->lastCodeLine->code);
+
+        free(codeImage->lastCodeLine);
+        
+        codeImage->lastCodeLine = temp;
+    }
 }
 
 void freeCommand(command *new_command)

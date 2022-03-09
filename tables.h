@@ -11,7 +11,11 @@ typedef enum symbol_attribute
     
     EXTERN_ATT,
    
-    CODE_ATT
+    CODE_ATT,
+
+    ENTRY_ATT,
+
+    UNDEFINED_ATT
 
 } symbol_attribute;
 
@@ -31,6 +35,8 @@ typedef struct symbol_table_t
     int offset;
     /* attribute (data,external,code) */
     symbol_attribute attribute;
+
+    symbol_attribute attribute_2;
     /* next */
     symbol_table *next;
 
@@ -139,6 +145,7 @@ typedef struct command
 typedef struct machine_code
 {
     char *hexaCode;
+
     ARE_property ARE;
 
 } machine_code;
@@ -149,11 +156,14 @@ typedef struct code_line_t code_line;
 
 typedef struct code_line_t
 {
-    /* */
     int address;
-    /* data */
+    
     machine_code *code;
-    /* */
+
+    char *label_1;
+
+    char *label_2;
+
     code_line *next;
 
 } code_line_t;

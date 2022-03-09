@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "string.h": "c",
-        "firstpass.h": "c"
+        "firstpass.h": "c",
+        "macro.h": "c"
     }
 }
