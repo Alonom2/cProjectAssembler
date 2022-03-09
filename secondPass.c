@@ -103,3 +103,21 @@ int labelcmp(code_image *codeImage, symbol_table *symbolPointer)
         return dest_and_origin_match;
     }
 }
+
+
+
+code_line *reverseLinkedList(code_line *newCodeLine)
+{
+    code_line *tempLine;
+
+    while (newCodeLine->next != NULL)
+    {
+        tempLine = newCodeLine->next;
+
+        tempLine->back = newCodeLine;
+
+        newCodeLine = newCodeLine->next;
+    }
+
+    return tempLine;
+}

@@ -166,6 +166,8 @@ typedef struct code_line_t
 
     code_line *next;
 
+    code_line *back;
+
 } code_line_t;
 
 

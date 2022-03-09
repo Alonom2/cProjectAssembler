@@ -12,10 +12,10 @@ int main()
 {
     char currentLine[SIZE_LINE];
     char previousLine[SIZE_LINE];
-    FILE* fPointer1;
+    FILE *fPointer1, *fPointer2, *fPointer3, *fPointer4;
 
     char command_table[16][5] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "jsr", "red", "prn", "rts", "stop"};
-    int *IC, *DC, counter, wasLabel = 0, notSameSymbol = 1, close_to_null_code = 0;
+    int *IC, *DC, counter, wasLabel = 0, notSameSymbol = 1, close_to_null_code = 0, numOfCodeLines, numOfDataLines, baseFlag = 0;
     char *label;
     symbol_table *symbolPointer;
 
@@ -278,22 +278,82 @@ int main()
                     {
                         codeImage->currCodeLine->code->hexaCode = changeIntToHexa(symbolPointer->offset);
 
-                        codeImage->currCodeLine->code->ARE = EXTERNAL;
+                        if (symbolPointer->attribute != EXTERN_ATT)
+                        {
+                            codeImage->currCodeLine->code->ARE = RELOCATEABLE;
+                        }
+
+                        else
+                        {
+                            if (baseFlag == 0)
+                            {
+                                symbolPointer->base = (codeImage->currCodeLine->address) - 1;
+                                symbolPointer->offset = (codeImage->currCodeLine->address);
+                                baseFlag++;
+                            }
+
+                            codeImage->currCodeLine->code->ARE = EXTERNAL;
+                        }
 
                         codeImage->currCodeLine->next->code->hexaCode = changeIntToHexa(symbolPointer->base);
 
-                        codeImage->currCodeLine->next->code->ARE = EXTERNAL;
+                        if (symbolPointer->attribute != EXTERN_ATT)
+                        {
+                            codeImage->currCodeLine->next->code->ARE = RELOCATEABLE;
+                        }
+
+                        else
+                        {
+                            if (baseFlag == 0)
+                            {
+                                symbolPointer->base = (codeImage->currCodeLine->next->address) - 1;
+                                symbolPointer->offset = (codeImage->currCodeLine->next->address);
+                                baseFlag++;
+                            }
+
+                            codeImage->currCodeLine->next->code->ARE = EXTERNAL;
+                        }
                     }
 
                     if (labelcmp(codeImage, symbolPointer) == 3)
                     {
                         codeImage->currCodeLine->next->next->code->hexaCode = changeIntToHexa(symbolPointer->next->offset);
 
-                        codeImage->currCodeLine->next->next->code->ARE = EXTERNAL;
+                        if (symbolPointer->attribute != EXTERN_ATT)
+                        {
+                            codeImage->currCodeLine->next->next->code->ARE = RELOCATEABLE;
+                        }
+
+                        else
+                        {
+                            if (baseFlag == 0)
+                            {
+                                symbolPointer->base = (codeImage->currCodeLine->next->next->address) - 1;
+                                symbolPointer->offset = (codeImage->currCodeLine->next->next->address);
+                                baseFlag++;
+                            }
+
+                            codeImage->currCodeLine->next->next->code->ARE = EXTERNAL;
+                        }
 
                         codeImage->currCodeLine->next->next->next->code->hexaCode = changeIntToHexa(symbolPointer->next->base);
 
-                        codeImage->currCodeLine->next->next->next->code->ARE = EXTERNAL;
+                        if (symbolPointer->attribute != EXTERN_ATT)
+                        {
+                            codeImage->currCodeLine->next->next->next->code->ARE = RELOCATEABLE;
+                        }
+
+                        else
+                        {
+                            if (baseFlag == 0)
+                            {
+                                symbolPointer->base = (codeImage->currCodeLine->next->next->next->address) - 1;
+                                symbolPointer->offset = (codeImage->currCodeLine->next->next->next->address);
+                                baseFlag++;
+                            }
+
+                            codeImage->currCodeLine->next->next->next->code->ARE = EXTERNAL;
+                        }
                     }
                 }
 
@@ -303,22 +363,82 @@ int main()
                     {
                         codeImage->currCodeLine->next->code->hexaCode = changeIntToHexa(symbolPointer->offset);
 
-                        codeImage->currCodeLine->next->code->ARE = EXTERNAL;
+                        if (symbolPointer->attribute != EXTERN_ATT)
+                        {
+                            codeImage->currCodeLine->next->code->ARE = RELOCATEABLE;
+                        }
+
+                        else
+                        {
+                            if (baseFlag == 0)
+                            {
+                                symbolPointer->base = (codeImage->currCodeLine->next->address) - 1;
+                                symbolPointer->offset = (codeImage->currCodeLine->next->address);
+                                baseFlag++;
+                            }
+
+                            codeImage->currCodeLine->next->code->ARE = EXTERNAL;
+                        }
 
                         codeImage->currCodeLine->next->next->code->hexaCode = changeIntToHexa(symbolPointer->base);
 
-                        codeImage->currCodeLine->next->next->code->ARE = EXTERNAL;
+                        if (symbolPointer->attribute != EXTERN_ATT)
+                        {
+                            codeImage->currCodeLine->next->next->code->ARE = RELOCATEABLE;
+                        }
+
+                        else
+                        {
+                            if (baseFlag == 0)
+                            {
+                                symbolPointer->base = (codeImage->currCodeLine->next->next->address) - 1;
+                                symbolPointer->offset = (codeImage->currCodeLine->next->next->address);
+                                baseFlag++;
+                            }
+
+                            codeImage->currCodeLine->next->next->code->ARE = EXTERNAL;
+                        }
                     }
 
                     if (labelcmp(codeImage, symbolPointer) == 3)
                     {
                         codeImage->currCodeLine->next->next->next->code->hexaCode = changeIntToHexa(symbolPointer->next->offset);
 
-                        codeImage->currCodeLine->next->next->next->code->ARE = EXTERNAL;
+                        if (symbolPointer->attribute != EXTERN_ATT)
+                        {
+                            codeImage->currCodeLine->next->next->next->code->ARE = RELOCATEABLE;
+                        }
+
+                        else
+                        {
+                            if (baseFlag == 0)
+                            {
+                                symbolPointer->base = (codeImage->currCodeLine->next->next->next->address) - 1;
+                                symbolPointer->offset = (codeImage->currCodeLine->next->next->next->address);
+                                baseFlag++;
+                            }
+
+                            codeImage->currCodeLine->next->next->next->code->ARE = EXTERNAL;
+                        }
 
                         codeImage->currCodeLine->next->next->next->next->code->hexaCode = changeIntToHexa(symbolPointer->next->base);
 
-                        codeImage->currCodeLine->next->next->next->next->code->ARE = EXTERNAL;
+                        if (symbolPointer->attribute != EXTERN_ATT)
+                        {
+                            codeImage->currCodeLine->next->next->next->next->code->ARE = RELOCATEABLE;
+                        }
+
+                        else
+                        {
+                            if (baseFlag == 0)
+                            {
+                                symbolPointer->base = (codeImage->currCodeLine->next->next->next->next->address) - 1;
+                                symbolPointer->offset = (codeImage->currCodeLine->next->next->next->next->address);
+                                baseFlag++;
+                            }
+
+                            codeImage->currCodeLine->next->next->next->next->code->ARE = EXTERNAL;
+                        }
                     }
                 }
             }
@@ -328,6 +448,8 @@ int main()
             {
                 close_to_null_code = 0;
 
+                baseFlag = 0;
+
                 break;
             }
 
@@ -336,6 +458,8 @@ int main()
         
         if (symbolPointer->next == NULL)
         {
+            baseFlag = 0;
+
             break;
         }
 
@@ -345,14 +469,91 @@ int main()
         }
     }
 
+    numOfCodeLines = codeImage->lastCodeLine->address - 100;
+
+    numOfDataLines = codeImage->lastDataLine->address;
+
+    codeImage->lastDataLine = reverseLinkedList(codeImage->lastDataLine);
+
+    codeImage->lastCodeLine = reverseLinkedList(codeImage->lastCodeLine);
+
+    fPointer2 = fopen("ps.ob", "w");
+
+    for (counter = 0; counter <= numOfCodeLines; counter++)
+    {
+        if (codeImage->lastCodeLine->code->ARE == ABSOLUTE)
+        {
+            fprintf(fPointer2, "0%d  A%d-B%c-", 100 + counter, 4, codeImage->lastCodeLine->code->hexaCode[0]);
+            fprintf(fPointer2, "C%c-", codeImage->lastCodeLine->code->hexaCode[1]);
+            fprintf(fPointer2, "D%c-", codeImage->lastCodeLine->code->hexaCode[2]);
+            fprintf(fPointer2, "E%c\n", codeImage->lastCodeLine->code->hexaCode[3]);
+
+        }
+
+        else if (codeImage->lastCodeLine->code->ARE == EXTERNAL)
+        {
+            fprintf(fPointer2, "0%d  A%d-B%c-", 100 + counter, 1, codeImage->lastCodeLine->code->hexaCode[0]);
+            fprintf(fPointer2, "C%c-", codeImage->lastCodeLine->code->hexaCode[1]);
+            fprintf(fPointer2, "D%c-", codeImage->lastCodeLine->code->hexaCode[2]);
+            fprintf(fPointer2, "E%c\n", codeImage->lastCodeLine->code->hexaCode[3]);
+        }
+
+        else if (codeImage->lastCodeLine->code->ARE == RELOCATEABLE)
+        {
+            fprintf(fPointer2, "0%d  A%d-B%c-", 100 + counter, 2, codeImage->lastCodeLine->code->hexaCode[0]);
+            fprintf(fPointer2, "C%c-", codeImage->lastCodeLine->code->hexaCode[1]);
+            fprintf(fPointer2, "D%c-", codeImage->lastCodeLine->code->hexaCode[2]);
+            fprintf(fPointer2, "E%c\n", codeImage->lastCodeLine->code->hexaCode[3]);
+        }
+
+        codeImage->lastCodeLine = codeImage->lastCodeLine->back; 
+    }
+
+    for (counter = 0; counter <= numOfDataLines; counter++)
+    {
+        fprintf(fPointer2, "0%d  A%d-B%c-", 101 + numOfCodeLines++, 4, codeImage->lastDataLine->code->hexaCode[0]);
+        fprintf(fPointer2, "C%c-", codeImage->lastDataLine->code->hexaCode[1]);
+        fprintf(fPointer2, "D%c-", codeImage->lastDataLine->code->hexaCode[2]);
+        fprintf(fPointer2, "E%c\n", codeImage->lastDataLine->code->hexaCode[3]);
+
+        codeImage->lastDataLine = codeImage->lastDataLine->back; 
+    }
+
+    fPointer3 = fopen("ps.ent", "w");
+
+    fPointer4 = fopen("ps.ext", "w");
+
+    while (symbolTable[0] != NULL)
+    {
+        if (symbolTable[0]->attribute == EXTERN_ATT)
+        {
+            fprintf(fPointer3, "%s BASE %d\n", symbolTable[0]->symbol, symbolTable[0]->base);
+            fprintf(fPointer3, "%s OFFSET %d\n\n", symbolTable[0]->symbol, symbolTable[0]->offset);
+        }
+
+        if (symbolTable[0]->attribute_2 == ENTRY_ATT)
+        {
+            fprintf(fPointer4, "%s, %d, %d\n", symbolTable[0]->symbol, symbolTable[0]->base, symbolTable[0]->offset);
+        }
+
+        if (symbolTable[0]->next == NULL)
+        {
+            break;
+        }
+        
+        symbolTable[0] = symbolTable[0]->next;
+    }
+
     fclose(fPointer1);
+    fclose(fPointer2);
+    fclose(fPointer3);
+    fclose(fPointer4);
     freeSymbolTable(symbolTable[0]);
     freeCodeImage(codeImage);
     free(IC);
     free(DC);
     freeCommand(commandPointer);
-    free(symbolPointer);
-    free(commandPointer);
+    
 
     return 0; 
 }

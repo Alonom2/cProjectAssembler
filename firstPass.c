@@ -255,7 +255,7 @@ int *turnStringLineToArray(char* currentLine)
 
     int amount_of_chars = amountOfChars(currentLine);
 
-    int* array = (int *)malloc(amount_of_chars*sizeof(int));
+    int* array = (int *)malloc((amount_of_chars + 1)*sizeof(int));
 
     currentLine = (strstr(currentLine, "\"") + 1);
 
@@ -263,6 +263,8 @@ int *turnStringLineToArray(char* currentLine)
     {
         *(array + counter) = *(currentLine + counter);
     }
+
+    *(array + counter) = 0;
 
     return array;
 }
@@ -304,7 +306,7 @@ code_image *extractStringToCodeImage(char* currentLine, int *IC, int* DC, code_i
 
     int amount_of_chars = amountOfChars(currentLine);
 
-    int *charsArray = (int *)malloc(amount_of_chars*sizeof(int));
+    int *charsArray = (int *)malloc((amount_of_chars + 1)*sizeof(int));
 
     code_line *tempLine = (code_line *)malloc(sizeof(code_line));
 
@@ -312,14 +314,12 @@ code_image *extractStringToCodeImage(char* currentLine, int *IC, int* DC, code_i
 
     tempLine = codeImage->lastDataLine;
 
-    for (counter = 0; counter < amount_of_chars; counter++)
+    for (counter = 0; counter < amount_of_chars + 1; counter++)
     {
         tempLine = extractDataLineToCodeImage(*(charsArray + counter), IC, DC, tempLine);
 
         (IC[0])++;
     }
-
-    (IC[0])++;
     
     codeImage->lastDataLine = tempLine;
 

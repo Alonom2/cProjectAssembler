@@ -7,4 +7,6 @@
 
 int labelcmp(code_image *codeImage, symbol_table *symbolPointer);
 
+code_line *reverseLinkedList(code_line *newCodeLine);
+
 #endif
